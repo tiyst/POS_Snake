@@ -1,0 +1,3 @@
+C:/Users/tiyst/Documents/Programming/cpp/POS_Snake/cmake-build-debug/CMakeFiles/POS_Snake.dir
+C:/Users/tiyst/Documents/Programming/cpp/POS_Snake/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/tiyst/Documents/Programming/cpp/POS_Snake/cmake-build-debug/CMakeFiles/rebuild_cache.dir
