@@ -8,39 +8,42 @@
 #include "Snake.cpp"
 #include "GameGrid.cpp"
 
-class GameBoard : public sf::Drawable {
+class GameBoard {
 public:
 	static const unsigned int GRID_SIZE = 20;
-	GameBoard(unsigned int fps, unsigned int width, unsigned int height);
+	GameBoard(ResourceLoader &rl);
 	void initGameBoard();
-	void drawBoard();
 	void addDrawable(sf::Drawable* drawable);
 	void removeDrawable(int index);
 	void removeDrawable(sf::Drawable* drawable);
 
-	bool isActive() {
-		return window.isOpen();
+
+	void pollInput(sf::Keyboard::Key key) {
+        switch (key) {
+            case sf::Keyboard::Up:
+                break;
+            case sf::Keyboard::Down:
+                break;
+            case sf::Keyboard::Right:
+                break;
+            case sf::Keyboard::Left:
+                break;
+
+            default: break;
+        }
 	}
 
-	sf::RenderWindow* getWindow() {
-		return &window;
-	}
+	void drawBoard(sf::RenderWindow& target);
 
 private:
-	unsigned const int windowWidth, windowHeight, fps;
-	sf::RenderWindow window;
-	sf::Sprite gridSprite;
-//	int score; //Score should be in player class as it can be used as currency
+    sf::Sprite gridSprite;
 
-	std::vector<sf::Drawable*> drawables;
-	void drawDrawables();
-	void drawGrid();
+    std::vector<sf::Drawable*> drawables;
+    void drawDrawables(sf::RenderWindow& target);
+    void drawGrid(sf::RenderWindow& target);
 
-	GameGrid* gameGrid;
-	GameObject* grid[GRID_SIZE][GRID_SIZE];
-	void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
+    GameObject* grid[GRID_SIZE][GRID_SIZE];
 
-	}
 };
 
 

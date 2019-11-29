@@ -3,12 +3,10 @@
 #include "src/GameBoard.cpp"
 #include "src/Game.cpp"
 
-
-
 int main() {
 	ResourceLoader &rl = ResourceLoader::getInstance();
 	rl.initResourceLoader();
-	Game* game = new Game(rl);
+	Game* game = new Game(rl, 60, sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height);
 	game->run();
 
 	return 0;

@@ -16,7 +16,9 @@ public:
 
 	void changeCoordinates(sf::Vector2i cdr) {
 		coordinates = cdr;
+		sprite.setPosition(cdr.x, cdr.y);
 	}
+
 	void changeCoordinates(int x, int y) {
 		changeCoordinates(sf::Vector2i(x,y));
 	}
@@ -25,6 +27,8 @@ public:
 		return coordinates;
 	}
 
+	void setSize(int x, int y);
+	void setSize(sf::Vector2f newSize);
 	void setHidden(bool hidden);
 	void setTexture(sf::Texture* txt);
 

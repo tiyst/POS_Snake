@@ -5,29 +5,41 @@
 #include "Game.hpp"
 
 
-Game::Game(ResourceLoader &rl) : rl(rl) {
-	board = new GameBoard(60, sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height);
+Game::Game(ResourceLoader &rl, unsigned int fps, unsigned int width, unsigned int height)
+        : rl(rl), fps(fps), windowHeight(height), windowWidth(width) {
+	board = new GameBoard(rl);
 	Snake* snake = new Snake(4, 5, 5);
 	board->addDrawable(snake);
+
+    renderWindow.create(sf::VideoMode(windowWidth, windowHeight),"Snakerino");
+    renderWindow.setFramerateLimit(fps);
 }
 
 
 void Game::run() {
-	while (board->isActive()) {
+	while (renderWindow.isOpen()) {
 		sf::Event event;
-		while (board->getWindow()->pollEvent(event)) {
-			if (event.type == sf::Event::Closed || (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)) {
-				board->getWindow()->close();
+		while (renderWindow.pollEvent(event)) {
+			if (event.type == sf::Event::Closed) {
+                renderWindow.close();
+			}
+			if (event.type == sf::Event::KeyPressed) {
+			    if (event.key.code == sf::Keyboard::Escape) {
+                    renderWindow.close();
+			    }
+			    board->pollInput(event.key.code);
 			}
 			if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
 				auto *circle = new sf::CircleShape(50.f); //This took fucking forever to implement
 				circle->setRadius(70.f);
 				circle->setFillColor(sf::Color::Blue);
-				circle->setPosition(sf::Mouse::getPosition(*board->getWindow()).x, sf::Mouse::getPosition(*board->getWindow()).y);
+				circle->setPosition(sf::Mouse::getPosition(renderWindow).x, sf::Mouse::getPosition(renderWindow).y);
 				board->addDrawable(circle);
 			}
 		}
 
-		board->drawBoard();
+		renderWindow.clear();
+		board->drawBoard(renderWindow);
+		renderWindow.display();
 	}
 }

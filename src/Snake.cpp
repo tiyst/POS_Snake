@@ -4,6 +4,10 @@
 
 #include "Snake.hpp"
 
+Snake::Snake(int length, int x, int y) {
+    //todo
+}
+
 void Snake::move() {
 	sf::Vector2i firstPiecePos = snakePieces.at(0)->getCoordinates();
 	sf::Vector2i change(0,0);
@@ -48,11 +52,3 @@ void Snake::changeDirection(Snake::DIRECTION dir) {
 	}
 }
 
-bool Snake::hasCollided() {
-	sf::Vector2i first = snakePieces.at(0)->getCoordinates();
-	return false;
-}
-
-Snake::Snake(int length, int x, int y) {
-	//todo
-}

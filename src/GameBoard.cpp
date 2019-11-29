@@ -4,17 +4,12 @@
 
 #include "GameBoard.hpp"
 
-GameBoard::GameBoard(unsigned int fps, unsigned int width, unsigned int height)
-		: fps(fps), windowWidth(width), windowHeight(height) {
+GameBoard::GameBoard(ResourceLoader &rl) {
 	initGameBoard();
 }
 
 void GameBoard::initGameBoard() {
-	window.create(sf::VideoMode(windowWidth, windowHeight),"Snakerino");
-	window.setFramerateLimit(fps);
-
 	ResourceLoader &rl = ResourceLoader::getInstance();
-	rl.initResourceLoader();
 	rl.addTexture("Snake", "../res/Snake/snake.jpg");
 
 	sf::Texture* tx = rl.addTexture("gridSquare", "../res/Snake/gridSquare.jpg");
@@ -27,26 +22,12 @@ void GameBoard::initGameBoard() {
 //	}
 }
 
-void GameBoard::drawBoard() {
-	window.clear();
-	drawGrid();
-	drawDrawables();
-	window.display();
-}
-
-void GameBoard::drawDrawables() {
-	for (auto & drawable : drawables) {
-		window.draw(*drawable);
-	}
-}
-
 void GameBoard::addDrawable(sf::Drawable *drawable) {
 	drawables.push_back(drawable);
 }
 
 void GameBoard::removeDrawable(int index) {
 	drawables.erase(drawables.begin() + index);
-
 }
 
 void GameBoard::removeDrawable(sf::Drawable *drawable) {
@@ -58,16 +39,25 @@ void GameBoard::removeDrawable(sf::Drawable *drawable) {
 	}
 }
 
-void GameBoard::drawGrid() {
-	for (int x = 0; x < GRID_SIZE; x++) {
-		for (int y = 0; y < GRID_SIZE; y++) {
-			gridSprite.setPosition(x*50, y*50);
-			gridSprite.setScale(0.5,0.5);
-			window.draw(gridSprite);
+void GameBoard::drawGrid(sf::RenderWindow &target) {
+    for (int x = 0; x < GRID_SIZE; x++) {
+        for (int y = 0; y < GRID_SIZE; y++) {
+            gridSprite.setPosition(x*50, y*50);
+            gridSprite.setScale(0.5,0.5);
+            target.draw(gridSprite);
+        }
+    }
+}
 
-		}
-	}
+void GameBoard::drawDrawables(sf::RenderWindow& target) {
+    for (auto & drawable : drawables) {
+        target.draw(*drawable);
+    }
+}
 
+void GameBoard::drawBoard(sf::RenderWindow &target) {
+    drawGrid(target);
+    drawDrawables(target);
 }
 
 

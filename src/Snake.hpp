@@ -14,13 +14,11 @@ public:
 	enum STATUS { ALIVE, CRASHED, STOPPED };
 
 	Snake(int length, int x, int y);
-	~Snake();
+	~Snake() {};
 
 	void move();
 	void addPiece();
 	void changeDirection(DIRECTION dir);
-	void checkGameState();
-	bool hasCollided();
 
 private:
 	DIRECTION direction = DIRECTION::RIGHT; //default is right

@@ -18,12 +18,10 @@ class ResourceLoader : public NonCopyable , NonMovable {
 public:
 	static ResourceLoader& getInstance() {
 		static ResourceLoader instance; // Created on stack, initialised once, and sure to be destroyed
-		instance.initResourceLoader();
 		return instance;
 	}
 
 	void initResourceLoader() {
-		//TODO if initialised
 		try {
 			defaultFont = new sf::Font();
 			defaultFont->loadFromFile("../res/Engine/Roboto-Thin.ttf");

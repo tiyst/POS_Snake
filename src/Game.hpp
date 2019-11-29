@@ -9,17 +9,18 @@
 class Game {
 
 public:
-	Game(ResourceLoader &rl);
+	Game(ResourceLoader &rl, unsigned int fps, unsigned int width, unsigned int height);
 	~Game();
 
 	void run();
 
 
 private:
-	GameBoard* board;
-	ResourceLoader &rl;
+    GameBoard* board;
+    ResourceLoader &rl;
+    unsigned const int fps, windowHeight, windowWidth;
 
-
+	sf::RenderWindow renderWindow;
 };
 
 
