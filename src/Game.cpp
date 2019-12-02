@@ -7,10 +7,13 @@
 
 Game::Game(ResourceLoader &rl, unsigned int fps, unsigned int width, unsigned int height)
         : rl(rl), fps(fps), windowHeight(height), windowWidth(width) {
-	board = new GameBoard(rl);
-	Snake* snake = new Snake(4, 15, 5);
-	board->setSnake(snake);
+	rl.addTexture("Snake", "../res/Snake/snake.jpg");
+	rl.addTexture("Apple", "../res/Snake/apple.png");
 
+	board = new GameBoard();
+	snake = new Snake(4, 15, 5);
+	apple = new GameObject(0,0);
+	apple->setTexture(rl.getTexture("Apple"));
 
 	gameStarted = false;
 	tickTimeDelay = 500;
@@ -25,7 +28,7 @@ void Game::run() {
 		sf::Time time = clock.getElapsedTime();
 		if (gameStarted && time.asMilliseconds() > tickTimeDelay) {
 			clock.restart();
-			board->tick();
+			tick();
 		}
 		while (renderWindow.pollEvent(event)) {
 			if (event.type == sf::Event::Closed) {
@@ -38,7 +41,7 @@ void Game::run() {
 			    if (event.key.code == sf::Keyboard::Space) {
 			    	startGame();
 			    }
-			    board->pollInput(event.key.code);
+			    pollInput(event.key.code);
 			}
 			if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
 				auto *circle = new sf::CircleShape(50.f); //This took fucking forever to implement
@@ -49,10 +52,39 @@ void Game::run() {
 			}
 		}
 
-		renderWindow.clear();
-		renderWindow.draw(*board);
-		renderWindow.display();
+		drawCycle();
 	}
+}
+
+void Game::tick() {
+	//TODO check for collision / enlarge snake when apple
+	sf::Vector2i newPos = snake->getHeadCoordinates();
+	if (newPos.x > rl.getGridSize() || newPos.y > rl.getGridSize()) {
+		endGame();
+	}
+	//TODO collision to custom walls
+
+	if (newPos == apple->getCoordinates()) {
+		snake->addPiece();
+	} else {
+		snake->move();
+	}
+}
+
+void Game::pollInput(sf::Keyboard::Key key) {
+	switch (key) {
+		case sf::Keyboard::Up: snake->changeDirection(Snake::DIRECTION::UP);
+			break;
+		case sf::Keyboard::Down: snake->changeDirection(Snake::DIRECTION::DOWN);
+			break;
+		case sf::Keyboard::Right: snake->changeDirection(Snake::DIRECTION::RIGHT);
+			break;
+		case sf::Keyboard::Left: snake->changeDirection(Snake::DIRECTION::LEFT);
+			break;
+
+		default: break;
+	}
+
 }
 
 void Game::startGame() {
@@ -62,4 +94,12 @@ void Game::startGame() {
 
 void Game::endGame() {
 	gameStarted = false;
+	std::cout << "Game ended\n";
+}
+
+void Game::drawCycle() {
+	renderWindow.clear();
+	renderWindow.draw(*board);
+	renderWindow.draw(*snake);
+	renderWindow.display();
 }

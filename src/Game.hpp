@@ -16,8 +16,11 @@ public:
 
 
 private:
-    GameBoard* board;
-    ResourceLoader &rl;
+	ResourceLoader &rl;
+	GameBoard* board;
+    Snake* snake;
+    GameObject* apple;
+
     sf::Clock clock;
     bool gameStarted;
     int tickTimeDelay;
@@ -25,8 +28,11 @@ private:
 
 	sf::RenderWindow renderWindow;
 
+	void tick();
+	void pollInput(sf::Keyboard::Key key);
 	void startGame();
 	void endGame();
+	void drawCycle();
 };
 
 
