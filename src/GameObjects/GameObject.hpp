@@ -6,6 +6,9 @@
 #define SNAKERINO_GAMEOBJECT_HPP
 
 
+#include <SFML/Graphics/Drawable.hpp>
+#include <SFML/Audio.hpp>
+
 class GameObject : public sf::Drawable {
 
 public:
@@ -16,7 +19,9 @@ public:
 
 	void changeCoordinates(sf::Vector2i cdr) {
 		coordinates = cdr;
-		sprite.setPosition(cdr.x, cdr.y);
+		float x = cdr.x * rl.getSquareSize() + rl.getWindowOffset(),
+			  y = cdr.y * rl.getSquareSize() + rl.getWindowOffset();
+		sprite.setPosition(x, y);
 	}
 
 	void changeCoordinates(int x, int y) {
@@ -29,6 +34,8 @@ public:
 
 	void setSize(int x, int y);
 	void setSize(sf::Vector2f newSize);
+	void setPosition(float x, float y);
+	void setPosition(sf::Vector2f newPos);
 	void setHidden(bool hidden);
 	void setTexture(sf::Texture* txt);
 
@@ -36,10 +43,11 @@ protected:
 	sf::Vector2i coordinates;
 	sf::Texture* texture;
 	sf::Sprite sprite;
+	ResourceLoader &rl;
 
-	void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
+	void init();
 
-	}
+	void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 };
 
 

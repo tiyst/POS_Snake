@@ -5,7 +5,7 @@
 #ifndef SNAKERINO_SNAKE_HPP
 #define SNAKERINO_SNAKE_HPP
 
-#include "SnakePiece.cpp"
+#include "GameObjects/SnakePiece.cpp"
 #include "GameBoard.hpp"
 
 class Snake : public sf::Drawable {
@@ -19,19 +19,20 @@ public:
 	void move();
 	void addPiece();
 	void changeDirection(DIRECTION dir);
+	void changeStatus(STATUS stat);
+	sf::Vector2i getHeadCoordinates();
+
+	void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
+		for (auto snakePiece : snakePieces) {
+			target.draw(*snakePiece, states);
+		}
+	}
 
 private:
 	DIRECTION direction = DIRECTION::RIGHT; //default is right
 	STATUS status = STATUS::STOPPED;
-
 	int snakeLength;
 	std::vector<SnakePiece*> snakePieces;
-
-	void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
-		for (int i = 0; i < snakePieces.size(); i++) {
-			target.draw(*snakePieces.at(i), states);
-		}
-     }
 
 };
 

@@ -21,16 +21,30 @@ public:
 		return instance;
 	}
 
-	void initResourceLoader() {
-		try {
-			defaultFont = new sf::Font();
-			defaultFont->loadFromFile("../res/Engine/Roboto-Thin.ttf");
-//			defaultSound.loadFromFile("../res/Engine/");
 
-			defaultTexture = new sf::Texture();
-			defaultTexture->loadFromFile("../res/Engine/texture.png");
-		} catch (const std::out_of_range& exc) {
-			std::cerr << "Missing Engine mandatory files.\n";
+	//TODO Check if it exists before adding
+	//TODO rewrite to templates
+
+	void initResourceLoader() {
+		if (squareSize == 0) {
+			try {
+				defaultFont = new sf::Font();
+				defaultFont->loadFromFile("../res/Engine/Roboto-Thin.ttf");
+	//			defaultSound.loadFromFile("../res/Engine/");
+
+				defaultTexture = new sf::Texture();
+				defaultTexture->loadFromFile("../res/Engine/texture.png");
+			} catch (const std::out_of_range& exc) {
+				std::cerr << "Missing Engine mandatory files.\n";
+			}
+
+			//gui stuff TODO Should be here?
+			int windowHeight = sf::VideoMode::getDesktopMode().height,
+				 windowWidth = sf::VideoMode::getDesktopMode().width;
+			gridSize = 20;
+			windowOffset = windowHeight / 15;
+			squareSize = (windowHeight - windowOffset * 2) / gridSize;
+
 		}
 	}
 
@@ -114,6 +128,18 @@ public:
 		return fontsMap;
 	}
 
+	int getSquareSize() {
+		return squareSize;
+	}
+
+	int getGridSize() {
+		return gridSize;
+	}
+
+	int getWindowOffset() {
+		return windowOffset;
+	}
+
 private:
 	sf::Font* defaultFont;
 	sf::SoundBuffer* defaultSound;
@@ -121,6 +147,9 @@ private:
 	std::unordered_map<std::string, sf::Texture*> texturesMap;
 	std::unordered_map<std::string, sf::SoundBuffer*> soundBufferMap;
 	std::unordered_map<std::string, sf::Font*> fontsMap;
+
+	int squareSize = 0, gridSize, windowOffset;
+
 };
 
 #endif //SNAKERINO_RESOURCELOADER_H

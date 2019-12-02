@@ -8,10 +8,13 @@
 Game::Game(ResourceLoader &rl, unsigned int fps, unsigned int width, unsigned int height)
         : rl(rl), fps(fps), windowHeight(height), windowWidth(width) {
 	board = new GameBoard(rl);
-	Snake* snake = new Snake(4, 5, 5);
-	board->addDrawable(snake);
+	Snake* snake = new Snake(4, 15, 5);
+	board->setSnake(snake);
 
-    renderWindow.create(sf::VideoMode(windowWidth, windowHeight),"Snakerino");
+
+	gameStarted = false;
+	tickTimeDelay = 500;
+    renderWindow.create(sf::VideoMode(windowWidth, windowHeight),"Snakerino");//, sf::Style::Fullscreen);
     renderWindow.setFramerateLimit(fps);
 }
 
@@ -19,6 +22,11 @@ Game::Game(ResourceLoader &rl, unsigned int fps, unsigned int width, unsigned in
 void Game::run() {
 	while (renderWindow.isOpen()) {
 		sf::Event event;
+		sf::Time time = clock.getElapsedTime();
+		if (gameStarted && time.asMilliseconds() > tickTimeDelay) {
+			clock.restart();
+			board->tick();
+		}
 		while (renderWindow.pollEvent(event)) {
 			if (event.type == sf::Event::Closed) {
                 renderWindow.close();
@@ -26,6 +34,9 @@ void Game::run() {
 			if (event.type == sf::Event::KeyPressed) {
 			    if (event.key.code == sf::Keyboard::Escape) {
                     renderWindow.close();
+			    }
+			    if (event.key.code == sf::Keyboard::Space) {
+			    	startGame();
 			    }
 			    board->pollInput(event.key.code);
 			}
@@ -39,7 +50,16 @@ void Game::run() {
 		}
 
 		renderWindow.clear();
-		board->drawBoard(renderWindow);
+		renderWindow.draw(*board);
 		renderWindow.display();
 	}
+}
+
+void Game::startGame() {
+	gameStarted = true;
+	clock.restart();
+}
+
+void Game::endGame() {
+	gameStarted = false;
 }

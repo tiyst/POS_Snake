@@ -18,9 +18,15 @@ public:
 private:
     GameBoard* board;
     ResourceLoader &rl;
+    sf::Clock clock;
+    bool gameStarted;
+    int tickTimeDelay;
     unsigned const int fps, windowHeight, windowWidth;
 
 	sf::RenderWindow renderWindow;
+
+	void startGame();
+	void endGame();
 };
 
 
