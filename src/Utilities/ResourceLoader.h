@@ -42,7 +42,7 @@ public:
 			int windowHeight = sf::VideoMode::getDesktopMode().height,
 				 windowWidth = sf::VideoMode::getDesktopMode().width;
 			gridSize = 20;
-			windowOffset = windowHeight / 15;
+			windowOffset = windowHeight / 20;
 			squareSize = (windowHeight - windowOffset * 2) / gridSize;
 
 		}

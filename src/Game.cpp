@@ -7,16 +7,17 @@
 
 Game::Game(ResourceLoader &rl, unsigned int fps, unsigned int width, unsigned int height)
         : rl(rl), fps(fps), windowHeight(height), windowWidth(width) {
-	rl.addTexture("Snake", "../res/Snake/snake.jpg");
 	rl.addTexture("Apple", "../res/Snake/apple.png");
+    rl.addTexture("Snake", "../res/Snake/snake.jpg");
 
-	board = new GameBoard();
-	snake = new Snake(4, 15, 5);
-	apple = new GameObject(0,0);
-	apple->setTexture(rl.getTexture("Apple"));
+    board = new GameBoard();
+    snake = new Snake(4, 15, 5);
+    apple = new GameObject(0,0);
+    apple->setTexture(rl.getTexture("Apple"));
+    changeApplePosition();
 
-	gameStarted = false;
-	tickTimeDelay = 500;
+    gameStarted = false;
+	tickTimeDelay = 200; //TODO change after testing
     renderWindow.create(sf::VideoMode(windowWidth, windowHeight),"Snakerino");//, sf::Style::Fullscreen);
     renderWindow.setFramerateLimit(fps);
 }
@@ -25,11 +26,6 @@ Game::Game(ResourceLoader &rl, unsigned int fps, unsigned int width, unsigned in
 void Game::run() {
 	while (renderWindow.isOpen()) {
 		sf::Event event;
-		sf::Time time = clock.getElapsedTime();
-		if (gameStarted && time.asMilliseconds() > tickTimeDelay) {
-			clock.restart();
-			tick();
-		}
 		while (renderWindow.pollEvent(event)) {
 			if (event.type == sf::Event::Closed) {
                 renderWindow.close();
@@ -51,6 +47,11 @@ void Game::run() {
 				board->addDrawable(circle);
 			}
 		}
+        sf::Time time = clock.getElapsedTime();
+        if (gameStarted && time.asMilliseconds() > tickTimeDelay) {
+            clock.restart();
+            tick();
+        }
 
 		drawCycle();
 	}
@@ -61,13 +62,17 @@ void Game::tick() {
 	sf::Vector2i newPos = snake->getHeadCoordinates();
 	if (newPos.x > rl.getGridSize() || newPos.y > rl.getGridSize()) {
 		endGame();
+		return;
 	}
 	//TODO collision to custom walls
 
-	if (newPos == apple->getCoordinates()) {
-		snake->addPiece();
-	} else {
-		snake->move();
+	if (gameStarted) {
+        if (newPos == apple->getCoordinates()) {
+            snake->addPiece();
+            changeApplePosition();
+        } else {
+            snake->move();
+        }
 	}
 }
 
@@ -84,7 +89,6 @@ void Game::pollInput(sf::Keyboard::Key key) {
 
 		default: break;
 	}
-
 }
 
 void Game::startGame() {
@@ -100,6 +104,12 @@ void Game::endGame() {
 void Game::drawCycle() {
 	renderWindow.clear();
 	renderWindow.draw(*board);
-	renderWindow.draw(*snake);
+    renderWindow.draw(*apple);
+    renderWindow.draw(*snake);
 	renderWindow.display();
+}
+
+void Game::changeApplePosition() {
+    srand(time(nullptr));
+    apple->changeCoordinates(rand() % rl.getGridSize(), rand() % rl.getGridSize());
 }

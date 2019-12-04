@@ -33,6 +33,7 @@ private:
 	void startGame();
 	void endGame();
 	void drawCycle();
+	void changeApplePosition();
 };
 
 

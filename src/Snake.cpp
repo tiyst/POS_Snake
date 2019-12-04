@@ -38,16 +38,12 @@ void Snake::addPiece() {
 
 	switch(direction) {
 		case UP: change.y -= 1;
-			std::cout << "Moving up\n";
 			break;
 		case DOWN: change.y += 1;
-			std::cout << "Moving up\n";
 			break;
 		case RIGHT: change.x += 1;
-			std::cout << "Moving up\n";
 			break;
 		case LEFT: change.x -= 1;
-			std::cout << "Moving up\n";
 			break;
 	}
 	auto* add = new SnakePiece(firstPiecePos + change);

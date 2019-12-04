@@ -51,7 +51,5 @@ void GameObject::setPosition(sf::Vector2f newPos) {
 }
 
 void GameObject::draw(sf::RenderTarget &target, sf::RenderStates states) const {
-//	sf::Vector2f vec(coordinates.x * rl.getSquareSize() + rl.getWindowOffset(),
-//			coordinates.y * rl.getSquareSize() + rl.getWindowOffset());
 	target.draw(sprite);
 }
