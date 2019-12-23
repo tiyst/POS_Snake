@@ -9,11 +9,10 @@
 class Game {
 
 public:
-	Game(ResourceLoader &rl, unsigned int fps, unsigned int width, unsigned int height);
+	Game(unsigned int fps, unsigned int width, unsigned int height);
 	~Game();
 
 	void run();
-
 
 private:
 	ResourceLoader &rl;
@@ -34,6 +33,8 @@ private:
 	void endGame();
 	void drawCycle();
 	void changeApplePosition();
+
+	void setTickTimeDelay(int delay);
 };
 
 

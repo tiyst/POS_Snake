@@ -5,8 +5,8 @@
 #include "Game.hpp"
 
 
-Game::Game(ResourceLoader &rl, unsigned int fps, unsigned int width, unsigned int height)
-        : rl(rl), fps(fps), windowHeight(height), windowWidth(width) {
+Game::Game(unsigned int fps, unsigned int width, unsigned int height)
+        : rl(ResourceLoader::getInstance()), fps(fps), windowHeight(height), windowWidth(width) {
 	rl.addTexture("Apple", "../res/Snake/apple.png");
     rl.addTexture("Snake", "../res/Snake/snake.jpg");
 
@@ -18,7 +18,8 @@ Game::Game(ResourceLoader &rl, unsigned int fps, unsigned int width, unsigned in
 
     gameStarted = false;
 	tickTimeDelay = 200; //TODO change after testing
-    renderWindow.create(sf::VideoMode(windowWidth, windowHeight),"Snakerino");//, sf::Style::Fullscreen);
+	int windowSize = rl.getGridSize() * rl.getSquareSize();
+    renderWindow.create(sf::VideoMode(windowSize, windowSize),"Snakerino");//, sf::Style::Fullscreen);
     renderWindow.setFramerateLimit(fps);
 }
 
@@ -60,9 +61,19 @@ void Game::run() {
 void Game::tick() {
 	//TODO check for collision / enlarge snake when apple
 	sf::Vector2i newPos = snake->getHeadCoordinates();
+	std::vector<SnakePiece*> *pieces = snake->getSnake();
+
 	if (newPos.x > rl.getGridSize() || newPos.y > rl.getGridSize()) {
 		endGame();
 		return;
+	}
+
+	for (int i = 1; i < pieces->size() - 1; i++) {
+		SnakePiece *piece = pieces->at(i);
+		if (newPos.x == piece->getCoordinates().x && newPos.y == piece->getCoordinates().y) {
+			endGame();
+			return;
+		}
 	}
 	//TODO collision to custom walls
 
@@ -111,5 +122,23 @@ void Game::drawCycle() {
 
 void Game::changeApplePosition() {
     srand(time(nullptr));
-    apple->changeCoordinates(rand() % rl.getGridSize(), rand() % rl.getGridSize());
+	int x, y;
+	x = rand() % rl.getGridSize();
+	y = rand() % rl.getGridSize();
+
+	//Checking if the apple is spawning on one of the snake pieces
+	auto pieces = snake->getSnake();
+	for (auto & piece : *pieces) {
+		sf::Vector2i coord = piece->getCoordinates();
+		if (coord.x == x && coord.y == y) {
+			changeApplePosition();
+			return;
+		}
+	}
+
+    apple->changeCoordinates(x, y);
+}
+
+void Game::setTickTimeDelay(int delay) {
+	tickTimeDelay = delay;
 }

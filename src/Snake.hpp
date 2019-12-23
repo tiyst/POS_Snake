@@ -20,6 +20,7 @@ public:
 	void addPiece();
 	void changeDirection(DIRECTION dir);
 	void changeStatus(STATUS stat);
+	std::vector<SnakePiece*>* getSnake();
 	sf::Vector2i getHeadCoordinates();
 
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override {

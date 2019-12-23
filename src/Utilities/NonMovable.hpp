@@ -5,8 +5,7 @@
 #ifndef SNAKERINO_NONMOVABLE_HPP
 #define SNAKERINO_NONMOVABLE_HPP
 
-struct NonMovable
-{
+struct NonMovable {
 	NonMovable() = default;
 	NonMovable& operator = (NonCopyable&&) = delete;
 	NonMovable(NonCopyable&&) = delete;

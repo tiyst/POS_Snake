@@ -4,7 +4,7 @@
 
 #include "GameBoard.hpp"
 
-GameBoard::GameBoard() : rl(ResourceLoader::getInstance()){
+GameBoard::GameBoard() : rl(ResourceLoader::getInstance()) {
 	initGameBoard();
 }
 

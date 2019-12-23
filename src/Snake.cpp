@@ -67,3 +67,8 @@ sf::Vector2i Snake::getHeadCoordinates() {
 	return snakePieces.at(0)->getCoordinates();
 }
 
+std::vector<SnakePiece *> *Snake::getSnake() {
+	return &snakePieces;
+}
+
+

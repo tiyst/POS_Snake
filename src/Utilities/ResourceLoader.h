@@ -18,6 +18,7 @@ class ResourceLoader : public NonCopyable , NonMovable {
 public:
 	static ResourceLoader& getInstance() {
 		static ResourceLoader instance; // Created on stack, initialised once, and sure to be destroyed
+		instance.initResourceLoader();
 		return instance;
 	}
 
@@ -26,7 +27,7 @@ public:
 	//TODO rewrite to templates
 
 	void initResourceLoader() {
-		if (squareSize == 0) {
+		if (!initialized) {
 			try {
 				defaultFont = new sf::Font();
 				defaultFont->loadFromFile("../res/Engine/Roboto-Thin.ttf");
@@ -39,12 +40,11 @@ public:
 			}
 
 			//gui stuff TODO Should be here?
-			int windowHeight = sf::VideoMode::getDesktopMode().height,
-				 windowWidth = sf::VideoMode::getDesktopMode().width;
-			gridSize = 20;
-			windowOffset = windowHeight / 20;
-			squareSize = (windowHeight - windowOffset * 2) / gridSize;
+			unsigned windowHeight = sf::VideoMode::getDesktopMode().height / 10 * 9;
 
+			gridSize = 20;
+			squareSize = windowHeight / gridSize;
+			initialized = true;
 		}
 	}
 
@@ -148,8 +148,8 @@ private:
 	std::unordered_map<std::string, sf::SoundBuffer*> soundBufferMap;
 	std::unordered_map<std::string, sf::Font*> fontsMap;
 
-	int squareSize = 0, gridSize, windowOffset;
-
+	int squareSize, gridSize, windowOffset;
+	bool initialized = false;
 };
 
 #endif //SNAKERINO_RESOURCELOADER_H
