@@ -14,6 +14,7 @@ Game::Game(unsigned int fps, unsigned int width, unsigned int height)
     snake = new Snake(4, 15, 5);
     apple = new GameObject(0,0);
     apple->setTexture(rl.getTexture("Apple"));
+    apple->setOriginToCenter();
     changeApplePosition();
 
     gameStarted = false;
@@ -63,7 +64,8 @@ void Game::tick() {
 	sf::Vector2i newPos = snake->getHeadCoordinates();
 	std::vector<SnakePiece*> *pieces = snake->getSnake();
 
-	if (newPos.x > rl.getGridSize() || newPos.y > rl.getGridSize()) {
+	if (newPos.x > rl.getGridSize() || newPos.y > rl.getGridSize() ||
+		newPos.x < 0 || newPos.y < 0) {
 		endGame();
 		return;
 	}
@@ -109,6 +111,7 @@ void Game::startGame() {
 
 void Game::endGame() {
 	gameStarted = false;
+	//TODO draw gameover to window
 	std::cout << "Game ended\n";
 }
 
@@ -131,12 +134,19 @@ void Game::changeApplePosition() {
 	for (auto & piece : *pieces) {
 		sf::Vector2i coord = piece->getCoordinates();
 		if (coord.x == x && coord.y == y) {
+			//FIXME This causes crash (11)
+			//If random coords are in snake this keeps calling itself,
+			//filling the stack with function calls
+			//either (x + rand()) % size (don't like this solution)
+			//or rebuild how the numbers are generated
 			changeApplePosition();
 			return;
 		}
 	}
 
-    apple->changeCoordinates(x, y);
+//    apple->changeCoordinates(x, y); //Can't use this due to changing position to be centered
+	int halfSize = rl.getSquareSize()/2;
+    apple->setPosition(x * rl.getSquareSize() + halfSize, y * rl.getSquareSize() + halfSize);
 }
 
 void Game::setTickTimeDelay(int delay) {
