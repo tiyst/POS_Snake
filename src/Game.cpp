@@ -9,6 +9,7 @@ Game::Game(unsigned int fps, unsigned int width, unsigned int height)
         : rl(ResourceLoader::getInstance()), fps(fps), windowHeight(height), windowWidth(width) {
 	rl.addTexture("Apple", "../res/Snake/apple.png");
     rl.addTexture("Snake", "../res/Snake/snake.jpg");
+    rl.addTexture("Wall",  "../res/Snake/brickWall.jpg");
 
     board = new GameBoard();
     snake = new Snake(4, 15, 5);
@@ -16,6 +17,16 @@ Game::Game(unsigned int fps, unsigned int width, unsigned int height)
     apple->setTexture(rl.getTexture("Apple"));
     apple->setOriginToCenter();
     changeApplePosition();
+
+	GameObject* wall = new GameObject(3,5);
+	GameObject* wall1 = new GameObject(8,2);
+	GameObject* wall2 = new GameObject(11,12);
+	wall->setTexture(rl.getTexture("Wall"));
+	wall1->setTexture(rl.getTexture("Wall"));
+	wall2->setTexture(rl.getTexture("Wall"));
+    walls.push_back(wall);
+    walls.push_back(wall1);
+    walls.push_back(wall2);
 
     gameStarted = false;
 	tickTimeDelay = 200; //TODO change after testing
@@ -78,6 +89,14 @@ void Game::tick() {
 		}
 	}
 	//TODO collision to custom walls
+	for (int j = 0; j < walls.size(); j++) {
+		sf::Vector2i wall = walls[j]->getCoordinates();
+		if (newPos.x == wall.x && newPos.y == wall.y) { //FIXME Why does this enter?
+			std::cout << "Collided with custom wall" << std::endl;
+			endGame();
+			return;
+		}
+	}
 
 	if (gameStarted) {
         if (newPos == apple->getCoordinates()) {
@@ -120,6 +139,9 @@ void Game::drawCycle() {
 	renderWindow.draw(*board);
     renderWindow.draw(*apple);
     renderWindow.draw(*snake);
+	for (auto & wall : walls) {
+		renderWindow.draw(*wall);
+	}
 	renderWindow.display();
 }
 
@@ -144,11 +166,22 @@ void Game::changeApplePosition() {
 		}
 	}
 
-//    apple->changeCoordinates(x, y); //Can't use this due to changing position to be centered
+	for(auto & wall : walls) {
+		sf::Vector2i coord = wall->getCoordinates();
+		if (coord.x == x && coord.y == y) {
+			changeApplePosition();
+			return;
+		}
+	}
 	int halfSize = rl.getSquareSize()/2;
-    apple->setPosition(x * rl.getSquareSize() + halfSize, y * rl.getSquareSize() + halfSize);
+    apple->changeCoordinates(x, y); //Has to be here for game to recognise where it is on gameboard
+	apple->setPosition(x * rl.getSquareSize() + halfSize, y * rl.getSquareSize() + halfSize);
 }
 
 void Game::setTickTimeDelay(int delay) {
 	tickTimeDelay = delay;
+}
+
+void Game::addWall(GameObject *wall) {
+	walls.push_back(wall);
 }

@@ -34,10 +34,17 @@ public:
 
 	void setSize(int x, int y);
 	void setSize(sf::Vector2f newSize);
+
 	void setPosition(float x, float y);
 	void setPosition(sf::Vector2f newPos);
+
+	void setOrigin(float x, float y);
+	void setOriginToCenter();
+
 	void setHidden(bool hidden);
 	void setTexture(sf::Texture* txt);
+
+	bool isClickedOn(sf::Vector2i coords);
 
 protected:
 	sf::Vector2i coordinates;

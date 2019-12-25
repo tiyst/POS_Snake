@@ -53,3 +53,13 @@ void GameObject::setPosition(sf::Vector2f newPos) {
 void GameObject::draw(sf::RenderTarget &target, sf::RenderStates states) const {
 	target.draw(sprite);
 }
+
+void GameObject::setOrigin(float x, float y) {
+	sprite.setOrigin(x, y);
+
+}
+
+void GameObject::setOriginToCenter() {
+	sf::Vector2u center = sprite.getTexture()->getSize();
+	sprite.setOrigin((int)center.x/2, (int)center.y/2);
+}

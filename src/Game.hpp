@@ -19,6 +19,7 @@ private:
 	GameBoard* board;
     Snake* snake;
     GameObject* apple;
+    std::vector<GameObject*> walls;
 
     sf::Clock clock;
     bool gameStarted;
@@ -33,6 +34,7 @@ private:
 	void endGame();
 	void drawCycle();
 	void changeApplePosition();
+	void addWall(GameObject* wall);
 
 	void setTickTimeDelay(int delay);
 };
