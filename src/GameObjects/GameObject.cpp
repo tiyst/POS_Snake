@@ -36,10 +36,10 @@ void GameObject::setSize(sf::Vector2f newSize) {
 }
 
 void GameObject::setSize(int x, int y) {
-    sf::Vector2f oldSize = sf::Vector2f(
-            sprite.getTexture()->getSize().x * sprite.getScale().x,
-            sprite.getTexture()->getSize().y * sprite.getScale().y);
-    sprite.setScale(x / oldSize.x , y / oldSize.y);
+    float fx = (float)x / sprite.getTexture()->getSize().x;
+    float fy = (float)y / sprite.getTexture()->getSize().y;
+
+    sprite.setScale(sf::Vector2f(fx,fy));
 }
 
 void GameObject::setPosition(float x, float y) {

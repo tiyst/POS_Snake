@@ -89,13 +89,13 @@ void Game::tick() {
 
 void Game::pollInput(sf::Keyboard::Key key) {
 	switch (key) {
-		case sf::Keyboard::Up: snake->changeDirection(Snake::DIRECTION::UP);
+		case sf::Keyboard::Up:    snake->changeDirection(Snake::DIRECTION::UP);
 			break;
-		case sf::Keyboard::Down: snake->changeDirection(Snake::DIRECTION::DOWN);
+		case sf::Keyboard::Down:  snake->changeDirection(Snake::DIRECTION::DOWN);
 			break;
 		case sf::Keyboard::Right: snake->changeDirection(Snake::DIRECTION::RIGHT);
 			break;
-		case sf::Keyboard::Left: snake->changeDirection(Snake::DIRECTION::LEFT);
+		case sf::Keyboard::Left:  snake->changeDirection(Snake::DIRECTION::LEFT);
 			break;
 
 		default: break;

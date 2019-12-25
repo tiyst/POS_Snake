@@ -6,7 +6,6 @@
 #define SNAKERINO_GAMEBOARD_HPP
 
 #include "Snake.cpp"
-#include "GameObjects/Apple.cpp"
 
 class GameBoard : public sf::Drawable {
 public:

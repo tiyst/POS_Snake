@@ -14,6 +14,7 @@ void GameBoard::initGameBoard() {
 	rl.addTexture("gridSquare", "../res/Snake/gridSquare.jpg");
 	gridTile = new SnakePiece(0, 0);
 	gridTile->setTexture(rl.getTexture("gridSquare"));
+	gridTile->setSize(rl.getSquareSize(),rl.getSquareSize());
 
 //	for (auto & i : grid) { //TODO Is explicit pointing to nullptr necessary?
 //		for (auto & j : i) {

@@ -15,8 +15,8 @@ int main() {
 
     //TODO Connection and choose to be snek or not snek
 
-    std::thread connectionThread(connect);
-    connectionThread.join();
+//    std::thread connectionThread(connect);
+//    connectionThread.join();
 
     ResourceLoader &rl = ResourceLoader::getInstance();
     Game* game = new Game(60, sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height);
@@ -46,7 +46,7 @@ void* connect() {
 		if (socket.send(data, 32) != sf::Socket::Done) {
 			// error...
 		}
-	} else if (cs == 's'){
+	} else if (cs == 's') {
 		sf::TcpListener listener;
 
 		// bind the listener to a port
@@ -63,13 +63,11 @@ void* connect() {
 		char data[100];
 		std::size_t received;
 
-		if (socket.receive(data, 100, received) != sf::Socket::Done)
-		{
+		if (socket.receive(data, 100, received) != sf::Socket::Done) {
 			// error...
 		}
 		std::cout << "Received " << received << " bytes" << std::endl;
-
-
+		std::cout << "Data received: " << data << std::endl;
 	} else {
 		connect();
 	}
