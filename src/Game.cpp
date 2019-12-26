@@ -50,14 +50,12 @@ void Game::run() {
 			    if (event.key.code == sf::Keyboard::Space) {
 			    	startGame();
 			    }
-			    pollInput(event.key.code);
+				pollKeyboardInput(event.key.code);
 			}
 			if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
-				auto *circle = new sf::CircleShape(50.f); //This took fucking forever to implement
-				circle->setRadius(70.f);
-				circle->setFillColor(sf::Color::Blue);
-				circle->setPosition(sf::Mouse::getPosition(renderWindow).x, sf::Mouse::getPosition(renderWindow).y);
-				board->addDrawable(circle);
+				int x = sf::Mouse::getPosition(renderWindow).x;
+				int y = sf::Mouse::getPosition(renderWindow).y;
+				pollMouseInput(event.mouseButton.button, sf::Vector2i(x,y));
 			}
 		}
         sf::Time time = clock.getElapsedTime();
@@ -108,7 +106,7 @@ void Game::tick() {
 	}
 }
 
-void Game::pollInput(sf::Keyboard::Key key) {
+void Game::pollKeyboardInput(sf::Keyboard::Key key) {
 	switch (key) {
 		case sf::Keyboard::Up:    snake->changeDirection(Snake::DIRECTION::UP);
 			break;
@@ -183,5 +181,20 @@ void Game::setTickTimeDelay(int delay) {
 }
 
 void Game::addWall(GameObject *wall) {
+	walls.push_back(wall);
+}
+
+void Game::pollMouseInput(sf::Mouse::Button button, sf::Vector2i pos) {
+	if(button == sf::Mouse::Left) {
+		//TODO if wall isn't there yet
+		int x = pos.x / rl.getSquareSize(), y = pos.y / rl.getSquareSize();
+		addWall(sf::Vector2i(x,y));
+	}
+
+}
+
+void Game::addWall(sf::Vector2i pos) {
+	GameObject* wall = new GameObject(pos);
+	wall->setTexture(rl.getTexture("Wall"));
 	walls.push_back(wall);
 }

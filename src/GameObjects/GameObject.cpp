@@ -63,3 +63,10 @@ void GameObject::setOriginToCenter() {
 	sf::Vector2u center = sprite.getTexture()->getSize();
 	sprite.setOrigin((int)center.x/2, (int)center.y/2);
 }
+
+bool GameObject::isClickedOn(sf::Vector2i coords) {
+	sf::Vector2f sprPos = sprite.getPosition();
+	return (coords.x > sprPos.x && coords.y > sprPos.y &&
+			coords.x <= sprPos.x + rl.getSquareSize()  &&
+			coords.y <= sprPos.y + rl.getSquareSize());
+}

@@ -29,12 +29,15 @@ private:
 	sf::RenderWindow renderWindow;
 
 	void tick();
-	void pollInput(sf::Keyboard::Key key);
+	void pollKeyboardInput(sf::Keyboard::Key key);
+	void pollMouseInput(sf::Mouse::Button button, sf::Vector2i pos);
 	void startGame();
 	void endGame();
 	void drawCycle();
 	void changeApplePosition();
+
 	void addWall(GameObject* wall);
+	void addWall(sf::Vector2i pos);
 
 	void setTickTimeDelay(int delay);
 };
