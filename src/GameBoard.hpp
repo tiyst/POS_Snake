@@ -20,7 +20,7 @@ public:
 
 
 private:
-    GameObject* gridTile; // TODO make grid a gameObject?? maybe
+    GameObject* gridTile;
 	ResourceLoader &rl;
 
     std::vector<sf::Drawable*> drawables;

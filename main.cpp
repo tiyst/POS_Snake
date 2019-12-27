@@ -8,6 +8,8 @@
 
 std::string ipAddress;
 const unsigned int port = 10001;
+const unsigned int packetSize = 128; //TODO calculate necessary packet size
+
 
 void* connect();
 
@@ -18,8 +20,8 @@ int main() {
 //    std::thread connectionThread(connect);
 //    connectionThread.join();
 
-    ResourceLoader &rl = ResourceLoader::getInstance();
-    Game* game = new Game(60, sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height);
+
+    Game* game = new Game(60);
 	game->run();
 
 	return 0;
@@ -30,6 +32,7 @@ void* connect() {
 	char cs;
 
     std::cout << "Do you want to run as client (c) or server (s)?\n";
+    std::cout << "Server controls the snake, others want him to crash\n";
     std::cin  >> cs;
 
 	if (cs == 'c') {
@@ -41,9 +44,10 @@ void* connect() {
 		if (status != sf::Socket::Done) {
 			// error...
 		}
-		char data[32] = "Hello World!";
 
-		if (socket.send(data, 32) != sf::Socket::Done) {
+		char data[packetSize] = "Hello World!";
+
+		if (socket.send(data, packetSize) != sf::Socket::Done) {
 			// error...
 		}
 	} else if (cs == 's') {
@@ -60,15 +64,18 @@ void* connect() {
 			// error...
 		}
 
-		char data[100];
+		char data[packetSize];
 		std::size_t received;
 
-		if (socket.receive(data, 100, received) != sf::Socket::Done) {
+		if (socket.receive(data, packetSize, received) != sf::Socket::Done) {
 			// error...
 		}
 		std::cout << "Received " << received << " bytes" << std::endl;
 		std::cout << "Data received: " << data << std::endl;
 	} else {
+		std::cout << "Wrong input, try again." << std::endl;
 		connect();
 	}
+
+	return nullptr;
 }

@@ -9,7 +9,13 @@
 class Game {
 
 public:
-	Game(unsigned int fps, unsigned int width, unsigned int height);
+	enum GAMESTATE {
+		NOT_STARTED,
+		IN_PROGRESS,
+		FINISHED
+	};
+
+	Game(unsigned int fps);
 	~Game();
 
 	void run();
@@ -24,7 +30,7 @@ private:
     sf::Clock clock;
     bool gameStarted;
     int tickTimeDelay;
-    unsigned const int fps, windowHeight, windowWidth;
+    unsigned const int fps;
 
 	sf::RenderWindow renderWindow;
 
@@ -36,7 +42,6 @@ private:
 	void drawCycle();
 	void changeApplePosition();
 
-	void addWall(GameObject* wall);
 	void addWall(sf::Vector2i pos);
 
 	void setTickTimeDelay(int delay);

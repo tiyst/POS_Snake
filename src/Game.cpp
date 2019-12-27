@@ -5,8 +5,8 @@
 #include "Game.hpp"
 
 
-Game::Game(unsigned int fps, unsigned int width, unsigned int height)
-        : rl(ResourceLoader::getInstance()), fps(fps), windowHeight(height), windowWidth(width) {
+Game::Game(unsigned int fps)
+        : rl(ResourceLoader::getInstance()), fps(fps){
 	rl.addTexture("Apple", "../res/Snake/apple.png");
     rl.addTexture("Snake", "../res/Snake/snake.jpg");
     rl.addTexture("Wall",  "../res/Snake/brickWall.jpg");
@@ -18,15 +18,10 @@ Game::Game(unsigned int fps, unsigned int width, unsigned int height)
     apple->setOriginToCenter();
     changeApplePosition();
 
-	GameObject* wall = new GameObject(3,5);
-	GameObject* wall1 = new GameObject(8,2);
-	GameObject* wall2 = new GameObject(11,12);
-	wall->setTexture(rl.getTexture("Wall"));
-	wall1->setTexture(rl.getTexture("Wall"));
-	wall2->setTexture(rl.getTexture("Wall"));
-    walls.push_back(wall);
-    walls.push_back(wall1);
-    walls.push_back(wall2);
+    //Testing Data might be randomised for n walls after
+    addWall(sf::Vector2i(3,5));
+    addWall(sf::Vector2i(8,2));
+    addWall(sf::Vector2i(11,13));
 
     gameStarted = false;
 	tickTimeDelay = 200; //TODO change after testing
@@ -86,10 +81,10 @@ void Game::tick() {
 			return;
 		}
 	}
-	//TODO collision to custom walls
+
 	for (int j = 0; j < walls.size(); j++) {
 		sf::Vector2i wall = walls[j]->getCoordinates();
-		if (newPos.x == wall.x && newPos.y == wall.y) { //FIXME Why does this enter?
+		if (newPos.x == wall.x && newPos.y == wall.y) {
 			std::cout << "Collided with custom wall" << std::endl;
 			endGame();
 			return;
@@ -118,6 +113,14 @@ void Game::pollKeyboardInput(sf::Keyboard::Key key) {
 			break;
 
 		default: break;
+	}
+}
+
+void Game::pollMouseInput(sf::Mouse::Button button, sf::Vector2i pos) {
+	if(button == sf::Mouse::Left) {
+		//TODO if wall isn't there yet
+		int x = pos.x / rl.getSquareSize(), y = pos.y / rl.getSquareSize();
+		addWall(sf::Vector2i(x,y));
 	}
 }
 
@@ -180,20 +183,8 @@ void Game::setTickTimeDelay(int delay) {
 	tickTimeDelay = delay;
 }
 
-void Game::addWall(GameObject *wall) {
-	walls.push_back(wall);
-}
-
-void Game::pollMouseInput(sf::Mouse::Button button, sf::Vector2i pos) {
-	if(button == sf::Mouse::Left) {
-		//TODO if wall isn't there yet
-		int x = pos.x / rl.getSquareSize(), y = pos.y / rl.getSquareSize();
-		addWall(sf::Vector2i(x,y));
-	}
-
-}
-
 void Game::addWall(sf::Vector2i pos) {
+	//TODO If not on apple or other wall
 	GameObject* wall = new GameObject(pos);
 	wall->setTexture(rl.getTexture("Wall"));
 	walls.push_back(wall);
