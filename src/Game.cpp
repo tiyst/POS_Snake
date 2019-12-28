@@ -110,6 +110,8 @@ void Game::pollKeyboardInput(sf::Keyboard::Key key) {
 			break;
 		case sf::Keyboard::Left:  snake->changeDirection(Snake::DIRECTION::LEFT);
 			break;
+		case sf::Keyboard::B: snake->triggerInvis();
+			break;
 
 		default: break;
 	}

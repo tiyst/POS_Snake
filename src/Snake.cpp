@@ -9,6 +9,7 @@ Snake::Snake(int length, int x, int y) {
 	for (int i = 0; i < length; ++i) {
 		snakePieces.push_back(new SnakePiece(x--,y));
 	}
+	invisible = false;
 	direction = DIRECTION::RIGHT;
 }
 
@@ -69,6 +70,10 @@ sf::Vector2i Snake::getHeadCoordinates() {
 
 std::vector<SnakePiece *> *Snake::getSnake() {
 	return &snakePieces;
+}
+
+void Snake::triggerInvis() {
+	invisible = !invisible;
 }
 
 
