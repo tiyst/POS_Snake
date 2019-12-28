@@ -44,6 +44,9 @@ private:
 
 	void addWall(sf::Vector2i pos);
 
+	bool isPositionTaken(int x, int y);
+	bool isPositionTaken(sf::Vector2i posCoord);
+
 	void setTickTimeDelay(int delay);
 };
 

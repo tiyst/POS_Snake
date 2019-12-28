@@ -64,7 +64,6 @@ void Game::run() {
 }
 
 void Game::tick() {
-	//TODO check for collision / enlarge snake when apple
 	sf::Vector2i newPos = snake->getHeadCoordinates();
 	std::vector<SnakePiece*> *pieces = snake->getSnake();
 
@@ -118,9 +117,10 @@ void Game::pollKeyboardInput(sf::Keyboard::Key key) {
 
 void Game::pollMouseInput(sf::Mouse::Button button, sf::Vector2i pos) {
 	if(button == sf::Mouse::Left) {
-		//TODO if wall isn't there yet
 		int x = pos.x / rl.getSquareSize(), y = pos.y / rl.getSquareSize();
-		addWall(sf::Vector2i(x,y));
+		if (!isPositionTaken(x, y)) {
+			addWall(sf::Vector2i(x,y));
+		}
 	}
 }
 
@@ -184,8 +184,28 @@ void Game::setTickTimeDelay(int delay) {
 }
 
 void Game::addWall(sf::Vector2i pos) {
-	//TODO If not on apple or other wall
-	GameObject* wall = new GameObject(pos);
-	wall->setTexture(rl.getTexture("Wall"));
-	walls.push_back(wall);
+	if(!isPositionTaken(pos)) {
+		GameObject* wall = new GameObject(pos);
+		wall->setTexture(rl.getTexture("Wall"));
+		walls.push_back(wall);
+	}
+}
+
+bool Game::isPositionTaken(int x, int y) {
+	return isPositionTaken(sf::Vector2i(x, y));
+}
+
+bool Game::isPositionTaken(sf::Vector2i posCoord) {
+	sf::Vector2i applePos = apple->getCoordinates();
+	if (applePos == posCoord) {
+		return true;
+	}
+
+	for (auto & wall : walls) {
+		if (wall->getCoordinates() == posCoord) {
+			return true;
+		}
+	}
+
+	return false;
 }
