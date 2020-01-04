@@ -74,5 +74,6 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+# CMake sfml directories
 cmake-build-debug/*
-cmake-build-tstdbg/*
+cmake-build-release/*
