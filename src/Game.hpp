@@ -5,6 +5,7 @@
 #ifndef SNAKERINO_GAME_HPP
 #define SNAKERINO_GAME_HPP
 
+#include "Network/effectPacket.hpp"
 
 class Game {
 
@@ -13,6 +14,13 @@ public:
 		NOT_STARTED,
 		IN_PROGRESS,
 		FINISHED
+	};
+
+	//IDs of game effects (easy to parse out of packet)
+	enum GAME_EFFECT {
+		WALL = 101,
+		SPEED = 102,
+		INVISIBILITY = 103
 	};
 
 	Game(unsigned int fps);
@@ -27,12 +35,18 @@ private:
     GameObject* apple;
     std::vector<GameObject*> walls;
 
-    sf::Clock clock;
-    bool gameStarted;
+    //"Delays" input so the snake won't be able to turn inside itself
+	sf::Clock turningClock;
+	sf::Clock gameRateClock;
+	bool gameStarted, isSpedUp, isInvisible;
     int tickTimeDelay;
     unsigned const int fps;
 
 	sf::RenderWindow renderWindow;
+
+	//networking
+	sf::TcpListener listener;
+	std::thread listeningThread;
 
 	void tick();
 	void pollKeyboardInput(sf::Keyboard::Key key);
@@ -43,11 +57,19 @@ private:
 	void changeApplePosition();
 
 	void addWall(sf::Vector2i pos);
+	void triggerSpeed();
+	void triggerInvisibility();
 
 	bool isPositionTaken(int x, int y);
 	bool isPositionTaken(sf::Vector2i posCoord);
 
 	void setTickTimeDelay(int delay);
+
+	void connect();
+	void sendPacket(GAME_EFFECT ef, int x, int y);
+	void receivePacket(sf::Packet& packet);
+
+	void* listen();
 };
 
 

@@ -68,12 +68,16 @@ sf::Vector2i Snake::getHeadCoordinates() {
 	return snakePieces.at(0)->getCoordinates();
 }
 
-std::vector<SnakePiece *> *Snake::getSnake() {
+std::vector<SnakePiece *> *Snake::getSnakePieces() {
 	return &snakePieces;
 }
 
-void Snake::triggerInvis() {
+void Snake::switchInvisibility() {
 	invisible = !invisible;
+}
+
+void Snake::setInvisibility(bool isInvis) {
+	invisible = isInvis;
 }
 
 

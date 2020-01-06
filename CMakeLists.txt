@@ -1,3 +1,20 @@
+cmake_minimum_required(VERSION 3.15)
+project(Snakerino)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -pedantic ")
+
+## If you want to link SFML statically
+# set(SFML_STATIC_LIBRARIES TRUE)
+
+#TODO repair cmake include errors
+#set(SFML_DIR "./SFML/lib/cmake/SFML")
+
+#set(SFML_STATIC_LIBRARIES TRUE)
+set (CMAKE_FIND_FRAMEWORK NEVER)
+
+find_package(SFML 2.5.1 COMPONENTS graphics audio REQUIRED)
+add_executable(Snakerino main.cpp)
+target_link_libraries(Snakerino sfml-system sfml-window sfml-graphics sfml-audio sfml-network)
+
 #cmake_minimum_required(VERSION 3.15)
 #project(Snakerino)
 #
@@ -32,31 +49,3 @@
 #
 #add_executable(Snakerino main.cpp)
 #target_link_libraries (Snakerino sfml-graphics sfml-window sfml-system sfml-audio sfml-network)
-
-
-#cmake_minimum_required(VERSION 3.15)
-#project(Snakerino)
-#
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-#
-#set(SOURCE_FILES main.cpp)
-#add_executable(Snakerino ${SOURCE_FILES})
-#include_directories(/include)
-#
-#find_package(SFML 2.5.1 COMPONENTS system window graphics network audio REQUIRED)
-#include_directories(${SFML_INCLUDE_DIRS})
-#target_link_libraries(Snakerino sfml-system sfml-window sfml-graphics sfml-audio sfml-network)
-
-cmake_minimum_required(VERSION 3.15)
-
-project(Snakerino)
-
-## If you want to link SFML statically
-# set(SFML_STATIC_LIBRARIES TRUE)
-
-#TODO repair cmake include errors
-#set(SFML_DIR "./sfml/lib/cmake/SFML")
-
-find_package(SFML 2.5.1 COMPONENTS graphics audio REQUIRED)
-add_executable(Snakerino main.cpp)
-target_link_libraries(Snakerino sfml-system sfml-window sfml-graphics sfml-audio sfml-network)

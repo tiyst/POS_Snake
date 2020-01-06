@@ -5,6 +5,10 @@
 #include "src/GameBoard.cpp"
 #include "src/Game.cpp"
 
+//debug includes
+//#include <filesystem>
+//namespace fs = std::__fs::filesystem;
+
 
 std::string ipAddress;
 const unsigned int port = 10001;
@@ -14,8 +18,9 @@ const unsigned int packetSize = 128; //TODO calculate necessary packet size
 void* connect();
 
 int main() {
-
-    //TODO Connection and choose to be snek or not snek
+	//debugging why resources aren't loaded
+//	std::cout << "Current path is " << fs::current_path() << '\n';
+//    TODO Connection and choose to be snek or not snek
 
 //    std::thread connectionThread(connect);
 //    connectionThread.join();
@@ -45,9 +50,10 @@ void* connect() {
 			// error...
 		}
 
-		char data[packetSize] = "Hello World!";
+//		char data[packetSize] = "Hello World!";
+		std::string data = "Hello World!";
 
-		if (socket.send(data, packetSize) != sf::Socket::Done) {
+		if (socket.send(&data, packetSize) != sf::Socket::Done) {
 			// error...
 		}
 	} else if (cs == 's') {

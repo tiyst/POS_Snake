@@ -20,8 +20,10 @@ public:
 	void addPiece();
 	void changeDirection(DIRECTION dir);
 	void changeStatus(STATUS stat);
-	void triggerInvis();
-	std::vector<SnakePiece*>* getSnake();
+
+	void switchInvisibility();
+	void setInvisibility(bool isInvis);
+	std::vector<SnakePiece*>* getSnakePieces();
 	sf::Vector2i getHeadCoordinates();
 
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
@@ -33,7 +35,7 @@ public:
 	}
 
 private:
-	DIRECTION direction = DIRECTION::RIGHT; //default is right
+	DIRECTION direction;
 	STATUS status = STATUS::STOPPED;
 
 	int snakeLength;

@@ -19,9 +19,9 @@ public:
 
 	void changeCoordinates(sf::Vector2i cdr) {
 		coordinates = cdr;
-		float x = cdr.x * rl.getSquareSize() + rl.getWindowOffset(),
-			  y = cdr.y * rl.getSquareSize() + rl.getWindowOffset();
-		sprite.setPosition(x, y);
+		int x = cdr.x * rl.getSquareSize() + rl.getWindowOffset(),
+			y = cdr.y * rl.getSquareSize() + rl.getWindowOffset();
+		sprite.setPosition((float)x, (float)y);
 	}
 
 	void changeCoordinates(int x, int y) {
