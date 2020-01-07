@@ -42,6 +42,9 @@ public:
 			//gui stuff TODO Should be here?
 			unsigned windowHeight = sf::VideoMode::getDesktopMode().height / 10 * 9;
 
+			port = 10001;
+			packetSize = 128; //TODO calculate packet size
+
 			gridSize = 20;
 			squareSize = windowHeight / gridSize;
 			initialized = true;
@@ -140,6 +143,14 @@ public:
 		return windowOffset;
 	}
 
+	int getPort() {
+	    return port;
+	}
+
+	int getPacketSize() {
+	    return packetSize;
+	}
+
 private:
 	sf::Font* defaultFont;
 	sf::SoundBuffer* defaultSound;
@@ -148,7 +159,7 @@ private:
 	std::unordered_map<std::string, sf::SoundBuffer*> soundBufferMap;
 	std::unordered_map<std::string, sf::Font*> fontsMap;
 
-	int squareSize, gridSize, windowOffset;
+	int squareSize, gridSize, windowOffset, port, packetSize;
 	bool initialized = false;
 };
 

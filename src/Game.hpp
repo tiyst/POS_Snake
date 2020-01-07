@@ -6,6 +6,7 @@
 #define SNAKERINO_GAME_HPP
 
 #include "Network/effectPacket.hpp"
+#include <thread>
 
 class Game {
 
@@ -38,14 +39,14 @@ private:
     //"Delays" input so the snake won't be able to turn inside itself
 	sf::Clock turningClock;
 	sf::Clock gameRateClock;
-	bool gameStarted, isSpedUp, isInvisible;
+	bool gameStarted, isSpedUp, isInvisible, isServer;
     int tickTimeDelay;
     unsigned const int fps;
 
 	sf::RenderWindow renderWindow;
 
 	//networking
-	sf::TcpListener listener;
+	sf::TcpSocket socket;
 	std::thread listeningThread;
 
 	void tick();
@@ -69,7 +70,7 @@ private:
 	void sendPacket(GAME_EFFECT ef, int x, int y);
 	void receivePacket(sf::Packet& packet);
 
-	void* listen();
+	void listen();
 };
 
 

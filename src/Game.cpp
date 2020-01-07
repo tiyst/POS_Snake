@@ -24,7 +24,11 @@ Game::Game(unsigned int fps)
 		addWall(sf::Vector2i(rand() % rl.getGridSize(), rand() % rl.getGridSize()));
 	}
 
-//	std::thread thread(listen(), nullptr);
+//	std::thread thread(connect());
+//	std::thread connectionThread(&Game::connect, this);
+//	TODO add animation for waiting
+//	connectionThread.join();
+//	listeningThread = std::thread(&Game::listen, this);
 
     gameStarted = false;
 	tickTimeDelay = 200; //TODO change after testing
@@ -64,6 +68,7 @@ void Game::run() {
 
 		drawCycle();
 	}
+	listeningThread.join();
 }
 
 void Game::tick() {
@@ -203,6 +208,14 @@ void Game::setTickTimeDelay(int delay) {
 
 void Game::addWall(sf::Vector2i pos) {
 	if(!isPositionTaken(pos)) {
+	    //Checking near apple, so enemies cannot trap you
+        sf::Vector2i applePos = apple->getCoordinates();
+        if ((applePos.x-1 <= pos.x && pos.x <= applePos.x+1) &&
+            (applePos.y-1 <= pos.y && pos.y <= applePos.y+1)) {
+            return;
+            //TODO return bool to indicate if the wall can be placed or not (you won't spend point if you can't place it)
+        }
+
 		GameObject* wall = new GameObject(pos);
 		wall->setTexture(rl.getTexture("Wall"));
 		walls.push_back(wall);
@@ -233,40 +246,39 @@ void Game::connect() {
 	int port = rl.getPort();
 	const int packetSize = rl.getPacketSize();
 
-
-
 	char cs;
 	std::cout << "Do you want to run as client (c) or server (s)?\n";
 	std::cout << "Server controls the snake, others want him to crash\n";
 	std::cin  >> cs;
 
 	if (cs == 'c') {
+	    isServer = false;
 		std::cout << "Insert server's IP address.\n";
 		std::cin >> ipAddress;
 
 		sf::TcpSocket socket;
 		sf::Socket::Status status = socket.connect(ipAddress, port);
 		if (status != sf::Socket::Done) {
+		    std::cout << "Connection failed, please check the IP address and try again." << std:: endl;
 			// error...
 		}
 
 		std::string data = "Hello World!";
 
-		if (socket.send(&data, packetSize) != sf::Socket::Done) {
+        if (socket.send(&data, packetSize) != sf::Socket::Done) {
 			// error...
 		}
 	} else if (cs == 's') {
-		sf::TcpListener listener;
-
 		// bind the listener to a port
-		if (listener.listen(port) != sf::Socket::Done) {
-			// error...
+		isServer = true;
+        sf::TcpListener listener;
+        if (listener.listen(port) != sf::Socket::Done) {
+            std::cout << "Error while waiting for clients." << std::endl;
 		}
 
 		// accept a new connection
-		sf::TcpSocket socket;
 		if (listener.accept(socket) != sf::Socket::Done) {
-			// error...
+            std::cout << "Error while accepting new connection." << std::endl;
 		}
 
 		char data[packetSize];
@@ -275,6 +287,7 @@ void Game::connect() {
 		if (socket.receive(data, packetSize, received) != sf::Socket::Done) {
 			// error...
 		}
+
 		std::cout << "Received " << received << " bytes" << std::endl;
 		std::cout << "Data received: " << data << std::endl;
 	} else {
@@ -314,4 +327,15 @@ void Game::triggerSpeed() {
 
 void Game::triggerInvisibility() {
 	std::cout << "Triggering invis" << std::endl;
+}
+
+void Game::listen() {
+    int packetSize = rl.getPacketSize();
+    if (isServer) {
+        char data[packetSize];
+        std::size_t received;
+        if (socket.receive(data, packetSize, received) == sf::Socket::Done) {
+            //TODO process data
+        }
+    }
 }

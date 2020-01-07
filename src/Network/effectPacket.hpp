@@ -6,11 +6,15 @@
 #define SNAKERINO_PACKET_HPP
 
 
+#include <SFML/Network/Packet.hpp>
+#include <iostream>
+
 class effectPacket : sf::Packet {
 private:
 	virtual const void* onSend(std::size_t& size) {
 		std::cout << "Received Data with size: " << size << std::endl;
 	}
+
 	virtual void onReceive(const void* data, std::size_t size) {
 		std::cout << "Received Data: " << data << std::endl;
 	}
