@@ -19,9 +19,11 @@ public:
 
 	//IDs of game effects (easy to parse out of packet)
 	enum GAME_EFFECT {
+	    APPLE = 100,
 		WALL = 101,
 		SPEED = 102,
-		INVISIBILITY = 103
+		INVISIBILITY = 103,
+		SNAKE_MOVE = 104
 	};
 
 	Game(unsigned int fps);
@@ -69,6 +71,8 @@ private:
 	void connect();
 	void sendPacket(GAME_EFFECT ef, int x, int y);
 	void receivePacket(sf::Packet& packet);
+	void moveSnake();
+	void moveApple();
 
 	void listen();
 };

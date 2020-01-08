@@ -109,50 +109,61 @@ void Game::tick() {
 }
 
 void Game::pollKeyboardInput(sf::Keyboard::Key key) {
-	if (turningClock.getElapsedTime().asMilliseconds() < tickTimeDelay) {
-		std::cout << "CHINA" << key << std::endl;
-		return;
-	}
-	switch (key) {
-		case sf::Keyboard::Up:    snake->changeDirection(Snake::DIRECTION::UP);
-			break;
-		case sf::Keyboard::Down:  snake->changeDirection(Snake::DIRECTION::DOWN);
-			break;
-		case sf::Keyboard::Right: snake->changeDirection(Snake::DIRECTION::RIGHT);
-			break;
-		case sf::Keyboard::Left:  snake->changeDirection(Snake::DIRECTION::LEFT);
-			break;
-		case sf::Keyboard::B:
-			snake->switchInvisibility();
-			break;
+	if(isServer) {
+        if (turningClock.getElapsedTime().asMilliseconds() < tickTimeDelay) {
+            return; //To prevent turning snake inside itself
+        }
+        switch (key) {
+            case sf::Keyboard::Up:
+                snake->changeDirection(Snake::DIRECTION::UP);
+                break;
+            case sf::Keyboard::Down:
+                snake->changeDirection(Snake::DIRECTION::DOWN);
+                break;
+            case sf::Keyboard::Right:
+                snake->changeDirection(Snake::DIRECTION::RIGHT);
+                break;
+            case sf::Keyboard::Left:
+                snake->changeDirection(Snake::DIRECTION::LEFT);
+                break;
 
-		default: break;
+            default:
+                break;
+        }
+        turningClock.restart();
+    } else {
+	    if (key == sf::Keyboard::B) {
+            snake->switchInvisibility();
+        }
 	}
-	turningClock.restart();
 }
 
 void Game::pollMouseInput(sf::Mouse::Button button, sf::Vector2i pos) {
-	if(button == sf::Mouse::Left) {
-		int x = pos.x / rl.getSquareSize(), y = pos.y / rl.getSquareSize();
-		if (!isPositionTaken(x, y)) {
-			addWall(sf::Vector2i(x,y));
-		}
-	}
+	if (!isServer) {
+        if (button == sf::Mouse::Left) {
+            int x = pos.x / rl.getSquareSize(), y = pos.y / rl.getSquareSize();
+            if (!isPositionTaken(x, y)) {
+                addWall(sf::Vector2i(x, y));
+            }
+        }
+    }
 }
 
 void Game::startGame() {
-	if (!gameStarted) {
+	if (!gameStarted && isServer) {
 		gameStarted = true;
 		gameRateClock.restart();
 	}
 }
 
 void Game::endGame() {
-	gameStarted = false;
-	snake->setInvisibility(false);
+    if (isServer) {
+        gameStarted = false;
+        snake->setInvisibility(false);
 
-	//TODO draw gameover to window
-	std::cout << "Game ended\n";
+        //TODO draw gameover to window
+        std::cout << "Game ended\n";
+    }
 }
 
 void Game::drawCycle() {
@@ -207,19 +218,21 @@ void Game::setTickTimeDelay(int delay) {
 }
 
 void Game::addWall(sf::Vector2i pos) {
-	if(!isPositionTaken(pos)) {
-	    //Checking near apple, so enemies cannot trap you
-        sf::Vector2i applePos = apple->getCoordinates();
-        if ((applePos.x-1 <= pos.x && pos.x <= applePos.x+1) &&
-            (applePos.y-1 <= pos.y && pos.y <= applePos.y+1)) {
-            return;
-            //TODO return bool to indicate if the wall can be placed or not (you won't spend point if you can't place it)
-        }
+    if (isServer) {
+        if (!isPositionTaken(pos)) {
+            //Checking near apple, so enemies cannot trap you
+            sf::Vector2i applePos = apple->getCoordinates();
+            if ((applePos.x - 1 <= pos.x && pos.x <= applePos.x + 1) &&
+                (applePos.y - 1 <= pos.y && pos.y <= applePos.y + 1)) {
+                return;
+                //TODO return bool to indicate if the wall can be placed or not (you won't spend point if you can't place it)
+            }
 
-		GameObject* wall = new GameObject(pos);
-		wall->setTexture(rl.getTexture("Wall"));
-		walls.push_back(wall);
-	}
+            GameObject *wall = new GameObject(pos);
+            wall->setTexture(rl.getTexture("Wall"));
+            walls.push_back(wall);
+        }
+    }
 }
 
 bool Game::isPositionTaken(int x, int y) {
@@ -306,14 +319,17 @@ void Game::receivePacket(sf::Packet& packet) {
 	int ef;
 	packet >> ef >> x >> y;
 
-	GAME_EFFECT effect = (GAME_EFFECT) ef;
-	switch (effect) {
+	switch ((GAME_EFFECT) ef) {
+	    case APPLE: //TODO change position
+	        break;
 		case WALL: addWall(sf::Vector2i(x,y));
 			break;
 		case SPEED: triggerSpeed();
 			break;
 		case INVISIBILITY: triggerInvisibility();
 			break;
+	    case SNAKE_MOVE: //TODO Snake moving
+	        break;
 		default:
 			std::cout << "Unidentified effect received" << std::endl;
 			break;
@@ -338,4 +354,12 @@ void Game::listen() {
             //TODO process data
         }
     }
+}
+
+void Game::moveSnake() {
+
+}
+
+void Game::moveApple() {
+
 }
