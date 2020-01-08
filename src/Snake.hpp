@@ -20,6 +20,9 @@ public:
 	void addPiece();
 	void changeDirection(DIRECTION dir);
 	void changeStatus(STATUS stat);
+	Snake::DIRECTION getDirection() {
+	    return direction;
+	}
 
 	void switchInvisibility();
 	void setInvisibility(bool isInvis);

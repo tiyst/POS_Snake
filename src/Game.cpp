@@ -16,25 +16,31 @@ Game::Game(unsigned int fps)
     apple = new GameObject(0,0);
     apple->setTexture(rl.getTexture("Apple"));
     apple->setOriginToCenter();
-    changeApplePosition();
 
-    //Testing Data might be randomised for n walls after
-	srand(time(nullptr));
-	for (int i = 0; i < rl.getGridSize() / 3; i++) {
-		addWall(sf::Vector2i(rand() % rl.getGridSize(), rand() % rl.getGridSize()));
-	}
 
-//	std::thread thread(connect());
-//	std::thread connectionThread(&Game::connect, this);
-//	TODO add animation for waiting
-//	connectionThread.join();
-//	listeningThread = std::thread(&Game::listen, this);
+    int windowSize = rl.getGridSize() * rl.getSquareSize();
+    renderWindow.create(sf::VideoMode(windowSize, windowSize),"Snakerino");//, sf::Style::Fullscreen);
+    renderWindow.setFramerateLimit(fps);
+
+    std::thread connectionThread(&Game::connect, this);
+//	TODO addWall animation for waiting
+    connectionThread.join();
+    listening = true;
+    listeningThread = std::thread(&Game::listen, this);
+
+    if(isServer) {
+        srand(time(nullptr));
+        int x, y;
+        for (int i = 0; i < rl.getGridSize() / 3; i++) {
+            x = rand() % rl.getGridSize(), y = rand() % rl.getGridSize();
+            addWall(sf::Vector2i(x, y));
+            sendPacket(GAME_EFFECT::WALL, x, y);
+        }
+        changeApplePosition();
+    }
 
     gameStarted = false;
 	tickTimeDelay = 200; //TODO change after testing
-	int windowSize = rl.getGridSize() * rl.getSquareSize();
-    renderWindow.create(sf::VideoMode(windowSize, windowSize),"Snakerino");//, sf::Style::Fullscreen);
-    renderWindow.setFramerateLimit(fps);
 }
 
 
@@ -49,7 +55,7 @@ void Game::run() {
 			    if (event.key.code == sf::Keyboard::Escape) {
                     renderWindow.close();
 			    }
-			    if (event.key.code == sf::Keyboard::Space) {
+			    if (event.key.code == sf::Keyboard::Space && !gameStarted) {
 			    	startGame();
 			    }
 				pollKeyboardInput(event.key.code);
@@ -68,6 +74,7 @@ void Game::run() {
 
 		drawCycle();
 	}
+	endGame();
 	listeningThread.join();
 }
 
@@ -81,6 +88,7 @@ void Game::tick() {
 		return;
 	}
 
+	//Collision with snake itself
 	for (int i = 1; i < pieces->size() - 1; i++) {
 		SnakePiece *piece = pieces->at(i);
 		if (newPos.x == piece->getCoordinates().x && newPos.y == piece->getCoordinates().y) {
@@ -89,6 +97,7 @@ void Game::tick() {
 		}
 	}
 
+	//Collision with custom walls
 	for (int j = 0; j < walls.size(); j++) {
 		sf::Vector2i wall = walls[j]->getCoordinates();
 		if (newPos.x == wall.x && newPos.y == wall.y) {
@@ -102,8 +111,21 @@ void Game::tick() {
         if (newPos == apple->getCoordinates()) {
             snake->addPiece();
             changeApplePosition();
+            sendPacket(GAME_EFFECT::SNAKE_GROW, 0, 0);
         } else {
             snake->move();
+            int x = 0, y = 0;
+            switch (snake->getDirection()) {
+                case Snake::DIRECTION::UP: y++;
+                    break;
+                case Snake::DIRECTION::DOWN: y--;
+                    break;
+                case Snake::DIRECTION::RIGHT: x++;
+                    break;
+                case Snake::DIRECTION::LEFT: x--;
+                    break;
+            }
+            sendPacket(GAME_EFFECT::SNAKE_MOVE,x,y);
         }
 	}
 }
@@ -144,6 +166,7 @@ void Game::pollMouseInput(sf::Mouse::Button button, sf::Vector2i pos) {
             int x = pos.x / rl.getSquareSize(), y = pos.y / rl.getSquareSize();
             if (!isPositionTaken(x, y)) {
                 addWall(sf::Vector2i(x, y));
+                sendPacket(GAME_EFFECT::WALL, x, y);
             }
         }
     }
@@ -164,6 +187,7 @@ void Game::endGame() {
         //TODO draw gameover to window
         std::cout << "Game ended\n";
     }
+    listening = false;
 }
 
 void Game::drawCycle() {
@@ -211,6 +235,7 @@ void Game::changeApplePosition() {
 	int halfSize = rl.getSquareSize()/2;
     apple->changeCoordinates(x, y); //Has to be here for game to recognise where it is on gameboard
 	apple->setPosition(x * rl.getSquareSize() + halfSize, y * rl.getSquareSize() + halfSize);
+	sendPacket(GAME_EFFECT::APPLE, x, y);
 }
 
 void Game::setTickTimeDelay(int delay) {
@@ -218,20 +243,10 @@ void Game::setTickTimeDelay(int delay) {
 }
 
 void Game::addWall(sf::Vector2i pos) {
-    if (isServer) {
-        if (!isPositionTaken(pos)) {
-            //Checking near apple, so enemies cannot trap you
-            sf::Vector2i applePos = apple->getCoordinates();
-            if ((applePos.x - 1 <= pos.x && pos.x <= applePos.x + 1) &&
-                (applePos.y - 1 <= pos.y && pos.y <= applePos.y + 1)) {
-                return;
-                //TODO return bool to indicate if the wall can be placed or not (you won't spend point if you can't place it)
-            }
-
-            GameObject *wall = new GameObject(pos);
-            wall->setTexture(rl.getTexture("Wall"));
-            walls.push_back(wall);
-        }
+    if (!isPositionTaken(pos)) {
+        GameObject *wall = new GameObject(pos);
+        wall->setTexture(rl.getTexture("Wall"));
+        walls.push_back(wall);
     }
 }
 
@@ -251,7 +266,8 @@ bool Game::isPositionTaken(sf::Vector2i posCoord) {
 		}
 	}
 
-	return false;
+    return (applePos.x - 1 <= posCoord.x && posCoord.x <= applePos.x + 1) &&
+           (applePos.y - 1 <= posCoord.y && posCoord.y <= applePos.y + 1);
 }
 
 void Game::connect() {
@@ -264,22 +280,20 @@ void Game::connect() {
 	std::cout << "Server controls the snake, others want him to crash\n";
 	std::cin  >> cs;
 
+	sf::Packet packet;
 	if (cs == 'c') {
 	    isServer = false;
 		std::cout << "Insert server's IP address.\n";
 		std::cin >> ipAddress;
 
-		sf::TcpSocket socket;
 		sf::Socket::Status status = socket.connect(ipAddress, port);
 		if (status != sf::Socket::Done) {
-		    std::cout << "Connection failed, please check the IP address and try again." << std:: endl;
-			// error...
+		    std::cout << "Connection failed, please check the IP address and try again." << std::endl;
 		}
 
-		std::string data = "Hello World!";
-
-        if (socket.send(&data, packetSize) != sf::Socket::Done) {
-			// error...
+		packet << "Hello World!";
+        if (socket.send(packet) != sf::Socket::Done) {
+			std::cout << "Error sending packet to server" << std::endl;
 		}
 	} else if (cs == 's') {
 		// bind the listener to a port
@@ -293,16 +307,15 @@ void Game::connect() {
 		if (listener.accept(socket) != sf::Socket::Done) {
             std::cout << "Error while accepting new connection." << std::endl;
 		}
+		std::cout << "Client connected with IP address: " << socket.getRemoteAddress().getPublicAddress() << std::endl;
 
-		char data[packetSize];
-		std::size_t received;
-
-		if (socket.receive(data, packetSize, received) != sf::Socket::Done) {
+		if (socket.receive(packet) != sf::Socket::Done) {
 			// error...
 		}
 
-		std::cout << "Received " << received << " bytes" << std::endl;
-		std::cout << "Data received: " << data << std::endl;
+		std::string ret;
+		packet >> ret;
+		std::cout << "Data received: " << ret << std::endl;
 	} else {
 		std::cout << "Wrong input, try again." << std::endl;
 		connect();
@@ -312,6 +325,7 @@ void Game::connect() {
 void Game::sendPacket(GAME_EFFECT ef, int x, int y) {
 	sf::Packet packet;
 	packet << (int)ef << x << y;
+	socket.send(packet);
 }
 
 void Game::receivePacket(sf::Packet& packet) {
@@ -320,7 +334,7 @@ void Game::receivePacket(sf::Packet& packet) {
 	packet >> ef >> x >> y;
 
 	switch ((GAME_EFFECT) ef) {
-	    case APPLE: //TODO change position
+	    case APPLE: moveApple(x, y);
 	        break;
 		case WALL: addWall(sf::Vector2i(x,y));
 			break;
@@ -328,7 +342,9 @@ void Game::receivePacket(sf::Packet& packet) {
 			break;
 		case INVISIBILITY: triggerInvisibility();
 			break;
-	    case SNAKE_MOVE: //TODO Snake moving
+	    case SNAKE_MOVE: moveSnake(x, y);
+	        break;
+	    case SNAKE_GROW: snake->addPiece(); //TODO is this right?
 	        break;
 		default:
 			std::cout << "Unidentified effect received" << std::endl;
@@ -346,20 +362,33 @@ void Game::triggerInvisibility() {
 }
 
 void Game::listen() {
-    int packetSize = rl.getPacketSize();
-    if (isServer) {
-        char data[packetSize];
-        std::size_t received;
-        if (socket.receive(data, packetSize, received) == sf::Socket::Done) {
-            //TODO process data
+    sf::Packet pck;
+    while (listening) {
+        if (socket.receive(pck) == sf::Socket::Done) {
+            receivePacket(pck);
         }
     }
 }
 
-void Game::moveSnake() {
-
+void Game::moveSnake(int x, int y) {
+    if(x != 0) {
+        if (x > 0) {
+            snake->changeDirection(Snake::DIRECTION::RIGHT);
+        } else {
+            snake->changeDirection(Snake::DIRECTION::LEFT);
+        }
+    } else {
+        if (y > 0) {
+            snake->changeDirection(Snake::DIRECTION::UP);
+        } else {
+            snake->changeDirection(Snake::DIRECTION::DOWN);
+        }
+    }
+    snake->move();
 }
 
-void Game::moveApple() {
-
+void Game::moveApple(int x, int y) {
+    int halfSize = rl.getSquareSize()/2;
+    apple->changeCoordinates(x, y); //Has to be here for game to recognise where it is on gameboard
+    apple->setPosition(x * rl.getSquareSize() + halfSize, y * rl.getSquareSize() + halfSize);
 }

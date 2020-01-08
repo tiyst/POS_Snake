@@ -23,7 +23,8 @@ public:
 		WALL = 101,
 		SPEED = 102,
 		INVISIBILITY = 103,
-		SNAKE_MOVE = 104
+		SNAKE_MOVE = 104,
+		SNAKE_GROW = 105
 	};
 
 	Game(unsigned int fps);
@@ -41,7 +42,7 @@ private:
     //"Delays" input so the snake won't be able to turn inside itself
 	sf::Clock turningClock;
 	sf::Clock gameRateClock;
-	bool gameStarted, isSpedUp, isInvisible, isServer;
+	bool gameStarted, isSpedUp, isInvisible, isServer, listening;
     int tickTimeDelay;
     unsigned const int fps;
 
@@ -68,13 +69,16 @@ private:
 
 	void setTickTimeDelay(int delay);
 
+	//Network necessary stuff
 	void connect();
 	void sendPacket(GAME_EFFECT ef, int x, int y);
 	void receivePacket(sf::Packet& packet);
-	void moveSnake();
-	void moveApple();
-
+	void moveSnake(int x, int y);
+	void moveApple(int x, int y);
 	void listen();
+	void waitFor(int seconds) {
+
+	}
 };
 
 
